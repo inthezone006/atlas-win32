@@ -7,6 +7,8 @@ HWND hStatic_Atlas;
 HFONT hButtonFont;
 HWND hLoginButton;
 HWND hSignupButton;
+HWND hCatchphrase;
+HFONT hCatchphraseFont;
 
 int Scale(int value, int dpi)
 {
@@ -25,6 +27,12 @@ void RepositionControls(HWND hWnd)
     int atlasX = (windowWidth - atlasWidth) / 2;
     int atlasY = Scale(100, dpi);
     SetWindowPos(hStatic_Atlas, NULL, atlasX, atlasY, atlasWidth, atlasHeight, SWP_NOZORDER);
+
+    int phraseWidth = Scale(400, dpi);
+    int phraseHeight = Scale(30, dpi);
+    int phraseX = (windowWidth - phraseWidth) / 2;
+    int phraseY = Scale(150, dpi);
+    SetWindowPos(hCatchphrase, NULL, phraseX, phraseY, phraseWidth, phraseHeight, SWP_NOZORDER);
 
     int buttonWidth = Scale(120, dpi);
     int buttonHeight = Scale(40, dpi);
@@ -105,6 +113,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hStatic_Atlas = CreateWindow(L"STATIC", L"ATLAS", WS_VISIBLE | WS_CHILD | SS_CENTER,
             0, 0, 0, 0, hWnd, NULL, hInst, NULL);
 
+        hCatchphraseFont = CreateFont(Scale(22, dpi), 0, 0, 0, FW_NORMAL, TRUE, FALSE, FALSE, ANSI_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_SWISS, L"Segoe UI");
+
+        hCatchphrase = CreateWindow(L"STATIC", L"Preserve the Truth.", WS_VISIBLE | WS_CHILD | SS_CENTER,
+            0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+
         hLoginButton = CreateWindow(L"BUTTON", L"Login", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
             0, 0, 0, 0, hWnd, (HMENU)1, hInst, NULL);
 
@@ -114,12 +129,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (hFont)
         {
             SendMessage(hStatic_Atlas, WM_SETFONT, (WPARAM)hFont, TRUE);
+            SendMessage(hCatchphrase, WM_SETFONT, (WPARAM)hFont, TRUE);
         }
 
 		if (hButtonFont)
         {
             SendMessage(hLoginButton, WM_SETFONT, (WPARAM)hButtonFont, TRUE);
             SendMessage(hSignupButton, WM_SETFONT, (WPARAM)hButtonFont, TRUE);
+        }
+
+        if (hCatchphraseFont)
+        {
+            SendMessage(hCatchphrase, WM_SETFONT, (WPARAM)hCatchphraseFont, TRUE);
         }
 
         RepositionControls(hWnd);
@@ -148,7 +169,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CTLCOLORSTATIC:
     {
         HDC hdcStatic = (HDC)wParam;
-        if ((HWND)lParam == hStatic_Atlas)
+        if ((HWND)lParam == hStatic_Atlas || (HWND)lParam == hCatchphrase)
         {
             SetTextColor(hdcStatic, RGB(70, 107, 159));
 
@@ -166,6 +187,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
 		DeleteObject(hFont);
         DeleteObject(hButtonFont);
+		DeleteObject(hCatchphraseFont);
         PostQuitMessage(0);
         break;
     default:
